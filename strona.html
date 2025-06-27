@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pikselek - Link-in-Bio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      color: #ddd;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 40px 16px;
+
+      background: url('background.gif') no-repeat center center fixed;
+      background-size: cover;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: rgba(10, 10, 10, 0.75);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .card {
+      position: relative;
+      z-index: 1;
+      background: rgba(26, 26, 26, 0.85);
+      border-radius: 28px;
+      max-width: 400px;
+      width: 100%;
+      padding: 36px 28px 48px;
+      box-shadow:
+        0 12px 36px rgba(0, 0, 0, 0.8);
+      text-align: center;
+      transition: box-shadow 0.3s ease;
+      border: 1px solid #222;
+    }
+
+    .card:hover {
+      box-shadow:
+        0 20px 60px rgba(88, 101, 242, 0.8);
+    }
+
+    .avatar {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 5px solid #5865F2;
+      object-fit: cover;
+      margin: 0 auto 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 12px rgba(88, 101, 242, 0.5);
+      cursor: default;
+      background: #111;
+    }
+
+    .avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 28px rgba(88, 101, 242, 0.9);
+    }
+
+    /* Wrapping nick + badge */
+    .name-badge-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .name {
+      font-size: 34px;
+      font-weight: 800;
+      color: #eee;
+      letter-spacing: 0.04em;
+      user-select: none;
+      margin: 0;
+    }
+
+    .staff-badge {
+      width: 26px;
+      height: 26px;
+      cursor: default;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+    }
+
+    .staff-badge img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Tooltip staff badge */
+    .staff-badge:hover::after,
+    .staff-badge:focus::after {
+      content: attr(title);
+      position: absolute;
+      bottom: 125%;
+      background: #5865F2;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      white-space: nowrap;
+      user-select: none;
+      opacity: 1;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 10;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .staff-badge::after {
+      content: "";
+      position: absolute;
+      bottom: 115%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 6px;
+      border-style: solid;
+      border-color: #5865F2 transparent transparent transparent;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 10;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #5865F2;
+      padding: 7px 18px;
+      border-radius: 9999px;
+      font-weight: 700;
+      font-size: 14px;
+      color: white;
+      letter-spacing: 0.05em;
+      user-select: none;
+      margin-bottom: 14px;
+      box-shadow: 0 3px 14px rgba(88, 101, 242, 0.8);
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+      cursor: pointer;
+      user-select: text;
+    }
+
+    .badge:hover {
+      box-shadow: 0 5px 22px rgba(88, 101, 242, 1);
+      background: #4759c9;
+    }
+
+    .status {
+      font-size: 16px;
+      color: #bbb;
+      margin-bottom: 28px;
+      user-select: none;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    .link-button {
+      display: block;
+      margin: 12px auto;
+      width: 100%;
+      max-width: 360px;
+      padding: 16px 0;
+      border-radius: 16px;
+      font-weight: 700;
+      font-size: 17px;
+      color: #fff;
+      text-decoration: none;
+      background: #5865F2;
+      box-shadow: 0 8px 20px rgba(88, 101, 242, 0.8);
+      transition:
+        background 0.3s ease,
+        box-shadow 0.3s ease,
+        transform 0.2s ease;
+      user-select: none;
+      cursor: pointer;
+      border: none;
+      text-align: center;
+    }
+
+    .link-button:hover,
+    .link-button:focus {
+      background: #4759c9;
+      box-shadow: 0 12px 28px rgba(71, 89, 201, 1);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    /* Komunikat skopiowano */
+    #copyMessage {
+      color: #4caf50;
+      font-weight: 600;
+      margin-top: -18px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      height: 18px;
+      user-select: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #copyMessage.visible {
+      opacity: 1;
+    }
+
+    /* Przycisk muzyki (po prawej na środku) */
+    #musicControl {
+      position: fixed;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      background: rgba(88, 101, 242, 0.9);
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(88, 101, 242, 0.8);
+      transition: background 0.3s ease;
+      z-index: 100;
+    }
+
+    #musicControl:hover {
+      background: rgba(71, 89, 201, 1);
+    }
+
+    #musicControl svg {
+      fill: white;
+      width: 26px;
+      height: 26px;
+      pointer-events: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 440px) {
+      .card {
+        padding: 28px 20px 36px;
+      }
+
+      .avatar {
+        width: 110px;
+        height: 110px;
+        margin-bottom: 16px;
+      }
+
+      .name {
+        font-size: 28px;
+      }
+
+      .badge {
+        font-size: 13px;
+        padding: 6px 16px;
+      }
+
+      .link-button {
+        font-size: 15px;
+        padding: 14px 0;
+        max-width: 100%;
+      }
+
+      #musicControl {
+        width: 44px;
+        height: 44px;
+      }
+
+      #musicControl svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="region" aria-label="Link-in-bio Pikselek">
+    <img
+      class="avatar"
+      src="file_00000000ca1c6243850a51925bb84967.png"
+      alt="Zdjęcie Pikselek"
+      loading="lazy"
+    />
+
+    <div class="name-badge-wrapper" aria-label="Nick i status staff">
+      <div class="name" tabindex="0" aria-describedby="staffTooltip">Pikselek</div>
+      <div class="staff-badge" tabindex="0" role="img" aria-label="Staff" title="Staff">
+        <img src="staff.png" alt="Ikona staff" loading="lazy" />
+      </div>
+    </div>
+
+    <div id="discordBadge" class="badge" tabindex="0" role="button" aria-label="Skopiuj Discord p1kselek do schowka">@p1kselek</div>
+
+    <div class="status">youtuber, tiktoker</div>
+
+    <a class="link-button" href="https://www.youtube.com/@PXVE" target="_blank" rel="noopener noreferrer">📺 YouTube</a>
+    <a class="link-button" href="https://www.tiktok.com/@pikselek" target="_blank" rel="noopener noreferrer">🎵 TikTok</a>
+    <a class="link-button" href="https://discord.gg/Y6EmzShMB6" target="_blank" rel="noopener noreferrer">💬 Mój Discord Server</a>
+
+    <div id="copyMessage" role="alert" aria-live="polite"></div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="bgMusic" src="music.mp3" loop autoplay muted></audio>
+
+  <!-- Przycisk muzyki -->
+  <button id="musicControl" aria-label="Włącz wyłącz muzykę" title="Włącz/wyłącz muzykę">
+    <!-- Ikona głośnika (mute/unmute) -->
+    <svg id="musicIcon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M3 9v6h4l5 5V4L7 9H3z"/>
+      <path id="soundWave" d="M16.5 12a4.5 4.5 0 0 1-3 4.24" stroke="white" stroke-width="2" fill="none" />
+      <path id="soundWave2" d="M19 9a7 7 0 0 1 0 6" stroke="white" stroke-width="2" fill="none" />
+    </svg>
+  </button>
+
+  <script>
+    // Kopiowanie Discorda
+    const discordBadge = document.getElementById('discordBadge');
+    const copyMessage = document.getElementById('copyMessage');
+
+    discordBadge.addEventListener('click', () => {
+      navigator.clipboard.writeText('p1kselek').then(() => {
+        copyMessage.textContent = 'Skopiowano Discord: p1kselek';
+        copyMessage.classList.add('visible');
+        setTimeout(() => {
+          copyMessage.classList.remove('visible');
+          copyMessage.textContent = '';
+        }, 2500);
+      });
+    });
+
+    // Obsługa klawiatury (Enter/Space) na badge
+    discordBadge.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        discordBadge.click();
+      }
+    });
+
+    // Muzyka i kontrola mute/unmute
+    const bgMusic = document.getElementById('bgMusic');
+    const musicControl = document.getElementById('musicControl');
+    const musicIcon = document.getElementById('musicIcon');
+    const soundWave = document.getElementById('soundWave');
+    const soundWave2 = document.getElementById('soundWave2');
+
+    function updateIcon(muted) {
+      if (muted) {
+        // Ikona wyciszona (przekreślony głośnik)
+        musicIcon.innerHTML = `
+          <path d="M16 7L14 9L16 11L14 13L16 15" stroke="white" stroke-width="2" fill="none" />
+          <path d="M3 9v6h4l5 5V4L7 9H3z" fill="#ccc"/>
+        `;
+      } else {
+        // Ikona głośnika z falami dźwięku
+        musicIcon.innerHTML = `
+          <path d="M3 9v6h4l5 5V4L7 9H3z" />
+          <path id="soundWave" d="M16.5 12a4.5 4.5 0 0 1-3 4.24" stroke="white" stroke-width="2" fill="none" />
+          <path id="soundWave2" d="M19 9a7 7 0 0 1 0 6" stroke="white" stroke-width="2" fill="none" />
+        `;
+      }
+    }
+
+    musicControl.addEventListener('click', () => {
+      if (bgMusic.muted) {
+        bgMusic.muted = false;
+      } else {
+        bgMusic.muted = true;
+      }
+      updateIcon(bgMusic.muted);
+    });
+
+    // Na start ustaw ikonę wg statusu
+    updateIcon(bgMusic.muted);
+  </script>
+</body>
+</html>
